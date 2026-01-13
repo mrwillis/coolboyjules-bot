@@ -52,7 +52,7 @@ with this file it may be worth double checking key components locally.
 SUBMIT_PREDICTION = True  # set to True to publish your predictions to Metaculus
 USE_EXAMPLE_QUESTIONS = False  # set to True to forecast example questions rather than the tournament questions
 NUM_RUNS_PER_QUESTION = (
-    2  # The median forecast is taken between NUM_RUNS_PER_QUESTION runs
+    5  # The median forecast is taken between NUM_RUNS_PER_QUESTION runs
 )
 SKIP_PREVIOUSLY_FORECASTED_QUESTIONS = True
 
@@ -226,6 +226,8 @@ def get_open_question_ids_from_tournament() -> list[tuple[int, int]]:
                 )
                 open_question_id_post_id.append((question["id"], post_id))
 
+    print(f"Found {len(open_question_id_post_id)} open questions")
+
     return open_question_id_post_id
 
 
@@ -392,7 +394,6 @@ async def forecast_individual_question(
     if question_type == "multiple_choice":
         options = question_details["options"]
         summary_of_forecast += f"options: {options}\n"
-
     if (
         forecast_is_already_made(post_details)
         and skip_previously_forecasted_questions == True
@@ -447,6 +448,7 @@ async def forecast_questions(
     num_runs_per_question: int,
     skip_previously_forecasted_questions: bool,
 ) -> None:
+    print(f"Forecasting {len(open_question_id_post_id)} questions")
     forecast_tasks = [
         forecast_individual_question(
             question_id,
